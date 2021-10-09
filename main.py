@@ -1,7 +1,9 @@
 import nltk
 import numpy
 import tflearn
+
 import tensorflow
+from tensorflow.python.framework import ops
 
 from nltk.stem.lancaster import LancasterStemmer
 stemmer = LancasterStemmer()
@@ -59,7 +61,7 @@ for x, doc in enumerate(docs_x):
 training = numpy.array(training)
 output = numpy.array(output)
 
-tensorflow.compat.v1.reset_default_graph()
+ops.reset_default_graph()
 
 net = tflearn.input_data(shape=[None, len(training[0])])
 net = tflearn.fully_connected(net, 8)

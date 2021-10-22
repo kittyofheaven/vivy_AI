@@ -1,8 +1,9 @@
 import nltk
+nltk.download('punkt')
 import numpy
-import tflearn
+# import tflearn
 
-import tensorflow
+import tensorflow as tf
 from tensorflow.python.framework import ops
 
 from nltk.stem.lancaster import LancasterStemmer
@@ -63,13 +64,27 @@ output = numpy.array(output)
 
 ops.reset_default_graph()
 
-net = tflearn.input_data(shape=[None, len(training[0])])
-net = tflearn.fully_connected(net, 8)
-net = tflearn.fully_connected(net, 8)
-net = tflearn.fully_connected(net, len(output[0]), activation="softmax")
-net = tflearn.regression(net)
+tf.random.set_seed(42)
 
-model = tflearn.DNN(net)
+model = tf.keras.Sequential([
+  tf.keras.layers.Input(shape=[None, len(training[0])]),
+  tf.keras.layers.Dense(8, name="hidden_layer"),
+  tf.keras.layers.Dense(8, name="hidden_layer2"), 
+  tf.keras.layers.Dense(len(output[0]), name="output_layer", activation="softmax")                             
+])
+# net = tflearn.input_data(shape=[None, len(training[0])])
+# net = tflearn.fully_connected(net, 8)
+# net = tflearn.fully_connected(net, 8)
+# net = tflearn.fully_connected(net, len(output[0]), activation="softmax")
+# net = tflearn.regression(net)
 
-model.fit(training, output, n_epoch=1000, batch_size=8, show_metric=True)
-model.save("model.tflearn")
+# model = tflearn.DNN(net)
+model.compile(loss="mae",
+              optimizer=tf.keras.optimizers.Adam(),
+              metrics=[tf.keras.metrics.Accuracy()])
+
+
+model.fit(training, output, epochs=1000, batch_size=8)
+model.save("model.h5")
+
+model.predict("hello")
